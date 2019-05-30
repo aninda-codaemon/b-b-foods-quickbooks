@@ -288,6 +288,9 @@ function _quickbooks_customer_import_response($requestID, $user, $action, $ID, $
 		
 		foreach ($List->children() as $Customer)
 		{
+			$is_active = $Customer->getChildDataAt('CustomerRet IsActive');
+			$is_active_val = ($is_active == true ? '1' : '0');
+			
 			$arr = array(
 				'ListID' => $Customer->getChildDataAt('CustomerRet ListID'),
 				'TimeCreated' => $Customer->getChildDataAt('CustomerRet TimeCreated'),
@@ -295,7 +298,7 @@ function _quickbooks_customer_import_response($requestID, $user, $action, $ID, $
 				'EditSequence' => $Customer->getChildDataAt('CustomerRet EditSequence'),
 				'Name' => $Customer->getChildDataAt('CustomerRet Name'),
 				'FullName' => $Customer->getChildDataAt('CustomerRet FullName'),
-				'IsActive' => $Customer->getChildDataAt('CustomerRet IsActive'),
+				'IsActive' => $is_active_val,
 				'Parent_ListID' => $Customer->getChildDataAt('CustomerRet Parent ListID'),
 				'Parent_FullName' => $Customer->getChildDataAt('CustomerRet Parent FullName'),
 				'Sublevel' => $Customer->getChildDataAt('CustomerRet Sublevel'),

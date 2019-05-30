@@ -195,32 +195,74 @@ CREATE TABLE IF NOT EXISTS qb_example_invoice_lineitem (
 --
 
 CREATE TABLE IF NOT EXISTS qb_example_item (
-  ListID varchar(40) NOT NULL,
-  TimeCreated datetime NOT NULL,
-  TimeModified datetime NOT NULL,
+  `ListID` varchar(40) NOT NULL,
+  `TimeCreated` datetime NOT NULL,
+  `TimeModified` datetime NOT NULL,
   `Name` varchar(50) NOT NULL,
-  FullName varchar(255) NOT NULL,
+  `FullName` varchar(255) NOT NULL,
   `Type` varchar(40) NOT NULL,
-  Parent_ListID varchar(40) NOT NULL,
-  Parent_FullName varchar(255) NOT NULL,
-  ManufacturerPartNumber varchar(40) NOT NULL,
-  SalesTaxCode_ListID varchar(40) NOT NULL,
-  SalesTaxCode_FullName varchar(255) NOT NULL,
-  BuildPoint varchar(40) NOT NULL,
-  ReorderPoint varchar(40) NOT NULL,
-  QuantityOnHand int(10) unsigned NOT NULL,
-  AverageCost float NOT NULL,
-  QuantityOnOrder int(10) unsigned NOT NULL,
-  QuantityOnSalesOrder int(10) unsigned NOT NULL,
-  TaxRate varchar(40) NOT NULL,
-  SalesPrice float NOT NULL,
-  SalesDesc text NOT NULL,
-  PurchaseCost float NOT NULL,
-  PurchaseDesc text NOT NULL,
-  PrefVendor_ListID varchar(40) NOT NULL,
-  PrefVendor_FullName varchar(255) NOT NULL,
-  PRIMARY KEY  (ListID)
+  `Parent_ListID` varchar(40) NOT NULL,
+  `Parent_FullName` varchar(255) NOT NULL,
+  `ManufacturerPartNumber` varchar(40) NOT NULL,
+  `SalesTaxCode_ListID` varchar(40) NOT NULL,
+  `SalesTaxCode_FullName` varchar(255) NOT NULL,
+  `BuildPoint` varchar(40) NOT NULL,
+  `ReorderPoint` varchar(40) NOT NULL,
+  `QuantityOnHand` int(10) unsigned NOT NULL,
+  `AverageCost` float NOT NULL,
+  `QuantityOnOrder` int(10) unsigned NOT NULL,
+  `QuantityOnSalesOrder` int(10) unsigned NOT NULL,
+  `TaxRate` varchar(40) NOT NULL,
+  `SalesPrice` float NOT NULL,
+  `SalesDesc` text NOT NULL,
+  `PurchaseCost` float NOT NULL,
+  `PurchaseDesc` text NOT NULL,
+  `PrefVendor_ListID` varchar(40) NOT NULL,
+  `PrefVendor_FullName` varchar(255) NOT NULL,
+  PRIMARY KEY  (`ListID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `qb_example_iteminventory`
+--
+
+CREATE TABLE `qb_example_iteminventory` (
+  `ListID` varchar(40) DEFAULT NULL,
+  `TimeCreated` datetime DEFAULT NULL,
+  `TimeModified` datetime DEFAULT NULL,
+  `EditSequence` text,
+  `Name` varchar(31) DEFAULT NULL,
+  `FullName` varchar(255) DEFAULT NULL,
+  `IsActive` tinyint(1) DEFAULT '0',
+  `Parent_ListID` varchar(40) DEFAULT NULL,
+  `Parent_FullName` varchar(255) DEFAULT NULL,
+  `Sublevel` int(10) UNSIGNED DEFAULT '0',
+  `ManufacturerPartNumber` varchar(31) DEFAULT NULL,
+  `UnitOfMeasureSet_ListID` varchar(40) DEFAULT NULL,
+  `UnitOfMeasureSet_FullName` varchar(255) DEFAULT NULL,
+  `SalesTaxCode_ListID` varchar(40) DEFAULT NULL,
+  `SalesTaxCode_FullName` varchar(255) DEFAULT NULL,
+  `SalesDesc` text,
+  `SalesPrice` decimal(13,5) DEFAULT NULL,
+  `IncomeAccount_ListID` varchar(40) DEFAULT NULL,
+  `IncomeAccount_FullName` varchar(255) DEFAULT NULL,
+  `PurchaseDesc` text,
+  `PurchaseCost` decimal(13,5) DEFAULT NULL,
+  `COGSAccount_ListID` varchar(40) DEFAULT NULL,
+  `COGSAccount_FullName` varchar(255) DEFAULT NULL,
+  `PrefVendor_ListID` varchar(40) DEFAULT NULL,
+  `PrefVendor_FullName` varchar(255) DEFAULT NULL,
+  `AssetAccount_ListID` varchar(40) DEFAULT NULL,
+  `AssetAccount_FullName` varchar(255) DEFAULT NULL,
+  `ReorderPoint` decimal(12,5) DEFAULT '0.00000',
+  `QuantityOnHand` decimal(12,5) DEFAULT '0.00000',
+  `AverageCost` decimal(13,5) DEFAULT NULL,
+  `QuantityOnOrder` decimal(12,5) DEFAULT '0.00000',
+  `QuantityOnSalesOrder` decimal(12,5) DEFAULT '0.00000',
+  PRIMARY KEY  (`ListID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 

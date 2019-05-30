@@ -40,29 +40,9 @@ define('QB_QUICKBOOKS_CONFIG_CURR', 'curr');
 define('QB_QUICKBOOKS_MAX_RETURNED', 10);
 
 /**
- * 
- */
-define('QB_PRIORITY_PURCHASEORDER', 4);
-
-/**
  * Request priorities, items sync first
  */
-define('QB_PRIORITY_ITEM', 3);
-
-/**
- * Request priorities, customers
- */
-define('QB_PRIORITY_CUSTOMER', 2);
-
-/**
- * Request priorities, salesorders
- */
-define('QB_PRIORITY_SALESORDER', 1);
-
-/**
- * Request priorities, invoices last... 
- */
-define('QB_PRIORITY_INVOICE', 0);
+define('QB_PRIORITY_INVENTORYITEM', 6);
 
 /**
  * Send error notices to this e-mail address
@@ -71,7 +51,7 @@ define('QB_QUICKBOOKS_MAILTO', 'keith@consolibyte.com');
 
 // Map QuickBooks actions to handler functions
 $map = array(
-		QUICKBOOKS_IMPORT_ITEM => array( '_quickbooks_item_import_request', '_quickbooks_item_import_response' ), 
+		QUICKBOOKS_IMPORT_INVENTORYITEM => array( '_quickbooks_inventoryitem_import_request', '_quickbooks_inventoryitem_import_response' ), 
 	);
 
 // Error handlers
@@ -96,19 +76,16 @@ $log_level = QUICKBOOKS_LOG_DEVELOP;
 //$soapserver = QUICKBOOKS_SOAPSERVER_PHP;			// The PHP SOAP extension, see: www.php.net/soap
 $soapserver = QUICKBOOKS_SOAPSERVER_BUILTIN;		// A pure-PHP SOAP server (no PHP ext/soap extension required, also makes debugging easier)
 
-$soap_options = array(			// See http://www.php.net/soap
-	);
+$soap_options = array();		// See http://www.php.net/soap
 
 $handler_options = array(		// See the comments in the QuickBooks/Server/Handlers.php file
 	'deny_concurrent_logins' => false, 
 	'deny_reallyfast_logins' => false, 
 	);		
 
-$driver_options = array(		// See the comments in the QuickBooks/Driver/<YOUR DRIVER HERE>.php file ( i.e. 'Mysql.php', etc. )
-	);
+$driver_options = array();		// See the comments in the QuickBooks/Driver/<YOUR DRIVER HERE>.php file ( i.e. 'Mysql.php', etc. )
 
-$callback_options = array(
-	);
+$callback_options = array();
 
 // * MAKE SURE YOU CHANGE THE DATABASE CONNECTION STRING BELOW TO A VALID MYSQL USERNAME/PASSWORD/HOSTNAME *
 $dsn = 'mysqli://root:@localhost/quickbooks_sqli';
@@ -150,13 +127,13 @@ function _quickbooks_hook_loginsuccess($requestID, $user, $hook, &$err, $hook_da
 	$date = '1983-01-02 12:01:01';
 	
 	// Set up the item imports
-	if (!_quickbooks_get_last_run($user, QUICKBOOKS_IMPORT_ITEM))
+	if (!_quickbooks_get_last_run($user, QUICKBOOKS_IMPORT_INVENTORYITEM))
 	{
-		_quickbooks_set_last_run($user, QUICKBOOKS_IMPORT_ITEM, $date);
+		_quickbooks_set_last_run($user, QUICKBOOKS_IMPORT_INVENTORYITEM, $date);
 	}
 	
 	// Make sure the requests get queued up
-	$Queue->enqueue(QUICKBOOKS_IMPORT_ITEM, 1, QB_PRIORITY_ITEM, null, $user);
+	$Queue->enqueue(QUICKBOOKS_IMPORT_INVENTORYITEM, 1, QB_PRIORITY_INVENTORYITEM, null, $user);
 }
 
 /**
@@ -221,7 +198,7 @@ function _quickbooks_set_current_run($user, $action, $force = null)
 /**
  * Build a request to import customers already in QuickBooks into our application
  */
-function _quickbooks_item_import_request($requestID, $user, $action, $ID, $extra, &$err, $last_action_time, $last_actionident_time, $version, $locale)
+function _quickbooks_inventoryitem_import_request($requestID, $user, $action, $ID, $extra, &$err, $last_action_time, $last_actionident_time, $version, $locale)
 {
 	// Iterator support (break the result set into small chunks)
 	$attr_iteratorID = '';
@@ -249,11 +226,11 @@ function _quickbooks_item_import_request($requestID, $user, $action, $ID, $extra
 		<?qbxml version="' . $version . '"?>
 		<QBXML>
 			<QBXMLMsgsRq onError="stopOnError">
-				<ItemQueryRq ' . $attr_iterator . ' ' . $attr_iteratorID . ' requestID="' . $requestID . '">
+				<ItemInventoryQueryRq ' . $attr_iterator . ' ' . $attr_iteratorID . ' requestID="' . $requestID . '">
 					<MaxReturned>' . QB_QUICKBOOKS_MAX_RETURNED . '</MaxReturned>
 					<FromModifiedDate>' . $last . '</FromModifiedDate>
 					<OwnerID>0</OwnerID>
-				</ItemQueryRq>	
+				</ItemInventoryQueryRq>	
 			</QBXMLMsgsRq>
 		</QBXML>';
 		
@@ -263,15 +240,14 @@ function _quickbooks_item_import_request($requestID, $user, $action, $ID, $extra
 /** 
  * Handle a response from QuickBooks 
  */
-function _quickbooks_item_import_response($requestID, $user, $action, $ID, $extra, &$err, $last_action_time, $last_actionident_time, $xml, $idents)
+function _quickbooks_inventoryitem_import_response($requestID, $user, $action, $ID, $extra, &$err, $last_action_time, $last_actionident_time, $xml, $idents)
 {	
-	error_log('test:item_import_response');
 	if (!empty($idents['iteratorRemainingCount']))
 	{
 		// Queue up another request
 		
 		$Queue = QuickBooks_WebConnector_Queue_Singleton::getInstance();
-		$Queue->enqueue(QUICKBOOKS_IMPORT_ITEM, null, QB_PRIORITY_ITEM, array( 'iteratorID' => $idents['iteratorID'] ), $user);
+		$Queue->enqueue(QUICKBOOKS_IMPORT_INVENTORYITEM, null, QB_PRIORITY_INVENTORYITEM, array( 'iteratorID' => $idents['iteratorID'] ), $user);
 	}
 	
 	// Import all of the records
@@ -281,56 +257,49 @@ function _quickbooks_item_import_response($requestID, $user, $action, $ID, $extr
 	if ($Doc = $Parser->parse($errnum, $errmsg))
 	{
 		$Root = $Doc->getRoot();
-		$List = $Root->getChildAt('QBXML/QBXMLMsgsRs/ItemQueryRs');
+		$List = $Root->getChildAt('QBXML/QBXMLMsgsRs/ItemInventoryQueryRs');
 		
 		foreach ($List->children() as $Item)
 		{
-			$type = substr(substr($Item->name(), 0, -3), 4);
-			$ret = $Item->name();
+			$is_active = $Item->getChildDataAt('ItemInventoryRet IsActive');
+			$is_active_val = ($is_active == true ? '1' : '0');
+			
 			$arr = array(
-				'ListID' => $Item->getChildDataAt($ret . ' ListID'),
-				'TimeCreated' => $Item->getChildDataAt($ret . ' TimeCreated'),
-				'TimeModified' => $Item->getChildDataAt($ret . ' TimeModified'),
-				'Name' => $Item->getChildDataAt($ret . ' Name'),
-				'FullName' => $Item->getChildDataAt($ret . ' FullName'),
-				'Type' => $type, 
-				'Parent_ListID' => $Item->getChildDataAt($ret . ' ParentRef ListID'),
-				'Parent_FullName' => $Item->getChildDataAt($ret . ' ParentRef FullName'),
-				'ManufacturerPartNumber' => $Item->getChildDataAt($ret . ' ManufacturerPartNumber'), 
-				'SalesTaxCode_ListID' => $Item->getChildDataAt($ret . ' SalesTaxCodeRef ListID'), 
-				'SalesTaxCode_FullName' => $Item->getChildDataAt($ret . ' SalesTaxCodeRef FullName'), 
-				'BuildPoint' => $Item->getChildDataAt($ret . ' BuildPoint'), 
-				'ReorderPoint' => $Item->getChildDataAt($ret . ' ReorderPoint'), 
-				'QuantityOnHand' => $Item->getChildDataAt($ret . ' QuantityOnHand'), 
-				'AverageCost' => $Item->getChildDataAt($ret . ' AverageCost'), 
-				'QuantityOnOrder' => $Item->getChildDataAt($ret . ' QuantityOnOrder'), 
-				'QuantityOnSalesOrder' => $Item->getChildDataAt($ret . ' QuantityOnSalesOrder'),  
-				'TaxRate' => $Item->getChildDataAt($ret . ' TaxRate'),  
+				'ListID' => $Item->getChildDataAt('ItemInventoryRet ListID'),
+				'TimeCreated' => $Item->getChildDataAt('ItemInventoryRet TimeCreated'),
+				'TimeModified' => $Item->getChildDataAt('ItemInventoryRet TimeModified'),
+				'EditSequence' => $Item->getChildDataAt('ItemInventoryRet EditSequence'),
+				'Name' => $Item->getChildDataAt('ItemInventoryRet Name'),
+				'FullName' => $Item->getChildDataAt('ItemInventoryRet FullName'),
+				'IsActive' => $is_active_val,
+				'Parent_ListID' => $Item->getChildDataAt('ItemInventoryRet ParentRef ListID'),
+				'Parent_FullName' => $Item->getChildDataAt('ItemInventoryRet ParentRef FullName'),
+				'Sublevel' =>  $Item->getChildDataAt('ItemInventoryRet Sublevel'),
+				'ManufacturerPartNumber' => $Item->getChildDataAt('ItemInventoryRet ManufacturerPartNumber'), 
+				'UnitOfMeasureSet_ListID' => $Item->getChildDataAt('ItemInventoryRet UnitOfMeasureSetRef ListID'), 
+				'UnitOfMeasureSet_FullName' => $Item->getChildDataAt('ItemInventoryRet UnitOfMeasureSetRef FullName'), 
+				'SalesTaxCode_ListID' => $Item->getChildDataAt('ItemInventoryRet SalesTaxCodeRef ListID'), 
+				'SalesTaxCode_FullName' => $Item->getChildDataAt('ItemInventoryRet SalesTaxCodeRef FullName'), 
+				'SalesDesc' => $Item->getChildDataAt('ItemInventoryRet SalesDesc'), 
+				'SalesPrice' => $Item->getChildDataAt('ItemInventoryRet SalesPrice'),
+				'IncomeAccount_ListID' => $Item->getChildDataAt('ItemInventoryRet IncomeAccountRef ListID'),
+				'IncomeAccount_FullName' => $Item->getChildDataAt('ItemInventoryRet IncomeAccountRef FullName'),
+				'PurchaseDesc' => $Item->getChildDataAt('ItemInventoryRet PurchaseDesc'),
+				'PurchaseCost' => $Item->getChildDataAt('ItemInventoryRet PurchaseCost'),
+				'COGSAccount_ListID' => $Item->getChildDataAt('ItemInventoryRet COGSAccountRef ListID'),
+				'COGSAccount_FullName' => $Item->getChildDataAt('ItemInventoryRet COGSAccountRef FullName'),
+				'PrefVendor_ListID' => $Item->getChildDataAt('ItemInventoryRet PrefVendorRef ListID'),
+				'PrefVendor_FullName' => $Item->getChildDataAt('ItemInventoryRet PrefVendorRef FullName'),
+				'AssetAccount_ListID' => $Item->getChildDataAt('ItemInventoryRet AssetAccountRef ListID'),
+				'AssetAccount_FullName' => $Item->getChildDataAt('ItemInventoryRet AssetAccountRef FullName'),
+				'ReorderPoint' => $Item->getChildDataAt('ItemInventoryRet ReorderPoint'), 
+				'QuantityOnHand' => $Item->getChildDataAt('ItemInventoryRet QuantityOnHand'), 
+				'AverageCost' => $Item->getChildDataAt('ItemInventoryRet AverageCost'), 
+				'QuantityOnOrder' => $Item->getChildDataAt('ItemInventoryRet QuantityOnOrder'), 
+				'QuantityOnSalesOrder' => $Item->getChildDataAt('ItemInventoryRet QuantityOnSalesOrder'),  
 				);
 			
-			$look_for = array(
-				'SalesPrice' => array( 'SalesOrPurchase Price', 'SalesAndPurchase SalesPrice', 'SalesPrice' ),
-				'SalesDesc' => array( 'SalesOrPurchase Desc', 'SalesAndPurchase SalesDesc', 'SalesDesc' ),
-				'PurchaseCost' => array( 'SalesOrPurchase Price', 'SalesAndPurchase PurchaseCost', 'PurchaseCost' ),
-				'PurchaseDesc' => array( 'SalesOrPurchase Desc', 'SalesAndPurchase PurchaseDesc', 'PurchaseDesc' ),
-				'PrefVendor_ListID' => array( 'SalesAndPurchase PrefVendorRef ListID', 'PrefVendorRef ListID' ), 
-				'PrefVendor_FullName' => array( 'SalesAndPurchase PrefVendorRef FullName', 'PrefVendorRef FullName' ),
-				); 
-			
-			foreach ($look_for as $field => $look_here)
-			{
-				if (!empty($arr[$field]))
-				{
-					break;
-				}
-				
-				foreach ($look_here as $look)
-				{
-					$arr[$field] = $Item->getChildDataAt($ret . ' ' . $look);
-				}
-			}
-			
-			QuickBooks_Utilities::log(QB_QUICKBOOKS_DSN, 'Importing ' . $type . ' Item ' . $arr['FullName'] . ': ' . print_r($arr, true));
+			QuickBooks_Utilities::log(QB_QUICKBOOKS_DSN, 'Importing Inventory Item ' . $arr['FullName'] . ': ' . print_r($arr, true));
 			$dblink = mysqli_connect("localhost", "root", "", "quickbooks_sqli");
 			foreach ($arr as $key => $value)
 			{
@@ -339,11 +308,11 @@ function _quickbooks_item_import_response($requestID, $user, $action, $ID, $extr
 			
 			//print_r(array_keys($arr));
 			//trigger_error(print_r(array_keys($arr), true));
-			
+
 			// Store the customers in MySQL
 			mysqli_query($dblink, "
 				REPLACE INTO
-					qb_example_item
+				qb_example_iteminventory
 				(
 					" . implode(", ", array_keys($arr)) . "
 				) VALUES (
@@ -367,23 +336,7 @@ function _quickbooks_error_e500_notfound($requestID, $user, $action, $ID, $extra
 {
 	$Queue = QuickBooks_WebConnector_Queue_Singleton::getInstance();
 	
-	if ($action == QUICKBOOKS_IMPORT_INVOICE)
-	{
-		return true;
-	}
-	else if ($action == QUICKBOOKS_IMPORT_CUSTOMER)
-	{
-		return true;
-	}
-	else if ($action == QUICKBOOKS_IMPORT_SALESORDER)
-	{
-		return true;
-	}
-	else if ($action == QUICKBOOKS_IMPORT_ITEM)
-	{
-		return true;
-	}
-	else if ($action == QUICKBOOKS_IMPORT_PURCHASEORDER)
+	if ($action == QUICKBOOKS_IMPORT_INVENTORYITEM)
 	{
 		return true;
 	}
