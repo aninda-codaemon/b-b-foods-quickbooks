@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<QBWCXML>
+	<AppName>QuickBooks-XML Credit Memo Import to DB - Recent</AppName>
+	<AppID></AppID>
+	<AppURL>http://localhost/quickbooks-xml/creditmemo_import_recent.php</AppURL>
+	<AppDescription></AppDescription>
+	<AppSupport>http://localhost/quickbooks-xml/creditmemo_import_recent.php</AppSupport>
+	<UserName>quickbooks</UserName>
+	<OwnerID>{10A44FB7-24D9-4815-AC85-AC75A7E7D1EB}</OwnerID>
+	<FileID>{16F3B9B6-76F0-4fcc-B1FF-857DE1803D20}</FileID>
+	<QBType>QBFS</QBType>
+	<Scheduler>
+		<RunEveryNMinutes>5</RunEveryNMinutes>
+	</Scheduler>
+	<IsReadOnly>false</IsReadOnly>
+</QBWCXML>

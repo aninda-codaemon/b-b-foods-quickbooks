@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<QBWCXML>
+	<AppName>QuickBooks-XML Create Invoice Receipts - Qty Out</AppName>
+	<AppID></AppID>
+	<AppURL>http://localhost/quickbooks-xml/invoiceadd.php</AppURL>
+	<AppDescription></AppDescription>
+	<AppSupport>http://localhost/quickbooks-xml/invoiceadd.php</AppSupport>
+	<UserName>quickbooks</UserName>
+	<OwnerID>{30A44FB7-34D9-4815-AC85-AC86A7E7D2EB}</OwnerID>
+	<FileID>{06F3B9B6-86F1-4fcc-B1FF-957DE2813D20}</FileID>
+	<QBType>QBFS</QBType>
+	<Scheduler>
+		<RunEveryNMinutes>5</RunEveryNMinutes>
+	</Scheduler>
+	<IsReadOnly>false</IsReadOnly>
+</QBWCXML>

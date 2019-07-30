@@ -1,5 +1,4 @@
 <?php
-
 error_reporting(E_ALL | E_STRICT);
 ini_set('display_errors', 1);
 
@@ -24,7 +23,12 @@ if(mysqli_num_rows($query) > 0){
 
     while ($row = mysqli_fetch_array($query))
     {
-        echo "ListID : ".$row['ListID']." <br><br>";
+        mysqli_query($dblink, "
+                INSERT INTO
+                qb_error_log
+                (`ListID`, `Module`, `Msg`) VALUES ('".$row['ListID']."', 'datatransfervendor', 'cron test')");
+        
+        //echo "ListID : ".$row['ListID']." <br><br>";
 
         $sql_row_maintbl = "SELECT * FROM `qb_vendor` where `ListID` = '".$row['ListID']."'";	
         $query_row_maintbl = mysqli_query($dblink, $sql_row_maintbl);
@@ -43,18 +47,18 @@ if(mysqli_num_rows($query) > 0){
                 //echo $result_row_main['ListID'];
                 //echo '<pre>';
                 //print_r($diff);
-                echo "update into qb_vandor : iteration - $iteration <br><br>";
+                //echo "update into qb_vandor : iteration - $iteration <br><br>";
                 foreach($diff as $key=>$val)
                 {
                     $val =  mysqli_real_escape_string($dblink, $val);
                     mysqli_query($dblink, "
-                    UPDATE qb_vendor SET ". $key . " = '". $val ."' WHERE `ListID` = '".$result_row_tmp['ListID']."'");
+                    UPDATE qb_vendor SET ". $key . " = '". $val ."' WHERE `ListID` = '".$result_row_tmptbl['ListID']."'");
                 }
             }else{
-                echo "equal : iteration - $iteration <br><br>" ;
+                //echo "equal : iteration - $iteration <br><br>" ;
             }
         }else{
-            echo "insert into qb_vendor : iteration - $iteration <br><br>";
+            //echo "insert into qb_vendor : iteration - $iteration <br><br>";
             
             foreach ($result_row_tmptbl as $key => $value)
 			{

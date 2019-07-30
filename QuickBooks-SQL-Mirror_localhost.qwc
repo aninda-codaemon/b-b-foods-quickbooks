@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<QBWCXML>
+	<AppName>QuickBooks SQL Mirror - localhost</AppName>
+	<AppID></AppID>
+	<AppURL>http://localhost/quickbooks-xml/example_mysql_mirror.php</AppURL>
+	<AppDescription>QuickBooks SQL Mirror - localhost</AppDescription>
+	<AppSupport>http://localhost/quickbooks-xml/example_mysql_mirror.php?support=1</AppSupport>
+	<UserName>JoelS</UserName>
+	<OwnerID>{7b23d8fc-7ee0-49e4-19b0-d720f7f3dc8d}</OwnerID>
+	<FileID>{c5a2d0f2-5122-0ea4-4151-3289438fafb4}</FileID>
+	<QBType>QBFS</QBType>
+	<Notify>false</Notify>
+	<Scheduler>
+		<RunEveryNMinutes>10</RunEveryNMinutes>
+	</Scheduler>
+	<IsReadOnly>false</IsReadOnly>
+</QBWCXML>

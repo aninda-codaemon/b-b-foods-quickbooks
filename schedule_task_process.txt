@@ -1,0 +1,4 @@
+D:\xampp\php\php.exe
+
+-f D:\xampp\htdocs\quickbooks-xml\datatransfercustomer.php
+
