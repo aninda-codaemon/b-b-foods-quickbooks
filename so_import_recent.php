@@ -130,10 +130,10 @@ function _quickbooks_salesorder_import_response($requestID, $user, $action, $ID,
 		
 		foreach ($List->children() as $SalesOrder)
 		{
-			$IsManuallyClosed = ($SalesOrder->getChildDataAt('SalesOrderRet IsManuallyClosed') == true) ? 1 : 0;
-			$IsFullyInvoiced = ($SalesOrder->getChildDataAt('SalesOrderRet IsFullyInvoiced') == true) ? 1 : 0;
-			$IsToBePrinted = ($SalesOrder->getChildDataAt('SalesOrderRet IsToBePrinted') == true) ? 1 : 0;
-			$IsToBeEmailed = ($SalesOrder->getChildDataAt('SalesOrderRet IsToBeEmailed') == true) ? 1 : 0;
+			$IsManuallyClosed = ($SalesOrder->getChildDataAt('SalesOrderRet IsManuallyClosed') === 'true') ? 1 : 0;
+			$IsFullyInvoiced = ($SalesOrder->getChildDataAt('SalesOrderRet IsFullyInvoiced') === 'true') ? 1 : 0;
+			$IsToBePrinted = ($SalesOrder->getChildDataAt('SalesOrderRet IsToBePrinted') === 'true') ? 1 : 0;
+			$IsToBeEmailed = ($SalesOrder->getChildDataAt('SalesOrderRet IsToBeEmailed') === 'true') ? 1 : 0;
 			
 			$arr = array(
 				'TxnID' => $SalesOrder->getChildDataAt('SalesOrderRet TxnID'),
@@ -235,7 +235,7 @@ function _quickbooks_salesorder_import_response($requestID, $user, $action, $ID,
 				{
 					$SalesOrderLine = $Child;
 					
-					$IsManuallyClosed = ($SalesOrderLine->getChildDataAt('SalesOrderLineRet IsManuallyClosed') == true) ? 1 : 0;
+					$IsManuallyClosed = ($SalesOrderLine->getChildDataAt('SalesOrderLineRet IsManuallyClosed') === 'true') ? 1 : 0;
 					$lineitem = array( 
 						'SalesOrder_TxnID' => $arr['TxnID'], 
 						'TxnLineID' => $SalesOrderLine->getChildDataAt('SalesOrderLineRet TxnLineID'), 

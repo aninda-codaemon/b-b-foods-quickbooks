@@ -129,7 +129,7 @@ function _quickbooks_vendor_import_response($requestID, $user, $action, $ID, $ex
 		foreach ($List->children() as $Vendor)
 		{
 			$is_active = $Vendor->getChildDataAt('VendorRet IsActive');
-			$is_active_val = ($is_active == true ? '1' : '0');
+			$is_active_val = ($is_active === 'true' ? '1' : '0');
 			
 			$arr = array(
                 'ListID' => $Vendor->getChildDataAt('VendorRet ListID'),

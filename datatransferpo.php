@@ -1,11 +1,18 @@
 <?php
+// I always program in E_STRICT error mode... 
 error_reporting(E_ALL | E_STRICT);
 ini_set('display_errors', 1);
+
+//set the maximum execution time to infinite for bulk data
+ini_set('max_execution_time', 0);
 
 // Require the framework
 require_once 'QuickBooks.php';
 
-$dblink = mysqli_connect("localhost", "root", "", "quickbooks_sqli");
+// Require the neccessary db connection
+require_once 'IncludesForDB.php';
+
+$dblink = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_DATABASE);
 
 $sql = "SELECT * FROM `qb_example_purchaseorder`";	
 $query = mysqli_query($dblink,$sql);
@@ -24,7 +31,7 @@ if(mysqli_num_rows($query) > 0) {
         $result_row_tmptbl = mysqli_fetch_assoc($query_row_tmptbl);
 
         if(mysqli_num_rows($query_row_maintbl) > 0){
-            //echo "update into qb_purchaseorder : iteration - $iteration <br><br>";
+            echo "update into qb_purchaseorder : iteration - $iteration <br><br>";
             $result_row_maintbl = mysqli_fetch_assoc($query_row_maintbl);
 
             //do the compare
