@@ -286,7 +286,7 @@ function _quickbooks_creditmemo_import_response($requestID, $user, $action, $ID,
 						$lineitem[$keyli] = mysqli_real_escape_string($dblink, $valueli);
 					}
 
-					// Store the invoices in MySQL
+					// Store the credit memos in MySQL
 					mysqli_query($dblink, "
 						INSERT INTO
 						qb_recent_creditmemo_creditmemoline

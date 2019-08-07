@@ -31,17 +31,13 @@ if(mysqli_num_rows($query) > 0) {
         $result_row_tmptbl = mysqli_fetch_assoc($query_row_tmptbl);
 
         if(mysqli_num_rows($query_row_maintbl) > 0){
-            echo "update into qb_purchaseorder : iteration - $iteration <br><br>";
-            $result_row_maintbl = mysqli_fetch_assoc($query_row_maintbl);
+            //echo "update into qb_purchaseorder : iteration - $iteration <br><br>";
+            //$result_row_maintbl = mysqli_fetch_assoc($query_row_maintbl);
 
             //do the compare
-            $diff = array_diff($result_row_tmptbl, $result_row_maintbl);
-            if(!empty($diff)){
-                //update qb_purchaseorder
-                //echo $result_row_maintbl['TxnID'];
-                //echo '<pre>';
-                //print_r($diff);
-                foreach($diff as $key=>$val)
+            //$diff = array_diff($result_row_tmptbl, $result_row_maintbl);
+            if(!empty($result_row_tmptbl)){
+                foreach($result_row_tmptbl as $key=>$val)
                 {
                     $val =  mysqli_real_escape_string($dblink, $val);
                     mysqli_query($dblink, "
@@ -61,20 +57,22 @@ if(mysqli_num_rows($query) > 0) {
 
                 if($count_pol_tmptbl == $count_pol_maintbl){
                     while ($row_pol_tmptbl = mysqli_fetch_array($query_rows_pol_tmptbl)) {
-                        $sql_row_pol_tmptbl = "SELECT Item_ListID, Item_FullName, ManufacturerPartNumber, Descrip, UnitOfMeasure, OverrideUOMSet_ListID, OverrideUOMSet_FullName, Rate, Class_ListID, Class_FullName, Amount, Customer_ListID, Customer_FullName, ServiceDate, ReceivedQuantity, IsManuallyClosed, Other1, Other2 FROM `qb_example_purchaseorder_purchaseorderline` where `TxnLineID` = '".$row_pol_tmptbl['TxnLineID']."'";	
+                        $sql_row_pol_tmptbl = "SELECT Item_ListID, Item_FullName, ManufacturerPartNumber, Descrip, Quantity, UnitOfMeasure, OverrideUOMSet_ListID, OverrideUOMSet_FullName, Rate, Class_ListID, Class_FullName, Amount, Customer_ListID, Customer_FullName, ServiceDate, ReceivedQuantity, IsManuallyClosed, Other1, Other2 FROM `qb_example_purchaseorder_purchaseorderline` where `TxnLineID` = '".$row_pol_tmptbl['TxnLineID']."'";	
                         $query_row_pol_tmptbl = mysqli_query($dblink, $sql_row_pol_tmptbl);
                         $result_row_pol_tmptbl = mysqli_fetch_assoc($query_row_pol_tmptbl);
 
-                        $sql_row_pol_maintbl = "SELECT Item_ListID, Item_FullName, ManufacturerPartNumber, Descrip, UnitOfMeasure, OverrideUOMSet_ListID, OverrideUOMSet_FullName, Rate, Class_ListID, Class_FullName, Amount, Customer_ListID, Customer_FullName, ServiceDate, ReceivedQuantity, IsManuallyClosed, Other1, Other2 FROM `qb_purchaseorder_purchaseorderline` where `TxnLineID` = '".$row_pol_tmptbl['TxnLineID']."'";	
+                        /*$sql_row_pol_maintbl = "SELECT Item_ListID, Item_FullName, ManufacturerPartNumber, Descrip, UnitOfMeasure, OverrideUOMSet_ListID, OverrideUOMSet_FullName, Rate, Class_ListID, Class_FullName, Amount, Customer_ListID, Customer_FullName, ServiceDate, ReceivedQuantity, IsManuallyClosed, Other1, Other2 FROM `qb_purchaseorder_purchaseorderline` where `TxnLineID` = '".$row_pol_tmptbl['TxnLineID']."'";	
                         $query_row_pol_maintbl = mysqli_query($dblink, $sql_row_pol_maintbl);
                         $result_row_pol_maintbl = mysqli_fetch_assoc($query_row_pol_maintbl);
-                        
                         //do the compare
-                        $diff_pol = array_diff($result_row_pol_tmptbl, $result_row_pol_maintbl);
-                        if(!empty($diff_pol)){
-                            foreach($diff_pol as $key_pol=>$val_pol)
+                        $diff_pol = array_diff($result_row_pol_tmptbl, $result_row_pol_maintbl);*/
+                        
+                        if(!empty($result_row_pol_tmptbl)){
+                            foreach($result_row_pol_tmptbl as $key_pol=>$val_pol)
                             {
                                 $val_pol =  mysqli_real_escape_string($dblink, $val_pol);
+                                //echo "UPDATE qb_purchaseorder_purchaseorderline SET ". $key_pol . " = '". $val_pol ."' WHERE `TxnLineID` = '".$row_pol_tmptbl['TxnLineID']."'";
+                                //echo '<br>';
                                 mysqli_query($dblink, "
                                 UPDATE qb_purchaseorder_purchaseorderline SET ". $key_pol . " = '". $val_pol ."' WHERE `TxnLineID` = '".$row_pol_tmptbl['TxnLineID']."'");
                             }
@@ -162,5 +160,4 @@ if(mysqli_num_rows($query) > 0) {
 
         $iteration++;
     }
-    
 }

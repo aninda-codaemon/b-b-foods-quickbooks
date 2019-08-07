@@ -227,7 +227,7 @@ function _quickbooks_creditmemo_import_response($requestID, $user, $action, $ID,
 			mysqli_query($dblink, "
 				DELETE FROM qb_example_creditmemo_creditmemoline WHERE CreditMemo_TxnID = '".$arr['TxnID']."'");
 
-			// Process all child elements of the Invoice Order
+			// Process all child elements of the credit memos
 			foreach ($CreditMemo->children() as $Child)
 			{
 				if ($Child->name() == 'CreditMemoLineRet')
@@ -286,7 +286,7 @@ function _quickbooks_creditmemo_import_response($requestID, $user, $action, $ID,
 						$lineitem[$keyli] = mysqli_real_escape_string($dblink, $valueli);
 					}
 
-					// Store the invoices in MySQL
+					// Store the credit memos in MySQL
 					mysqli_query($dblink, "
 						INSERT INTO
 						qb_example_creditmemo_creditmemoline

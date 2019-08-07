@@ -233,7 +233,7 @@ function _quickbooks_salesorder_import_response($requestID, $user, $action, $ID,
 				DELETE FROM qb_example_salesorder_salesorderline WHERE SalesOrder_TxnID = '" . mysqli_real_escape_string($dblink, $arr['TxnID']) . "'
 			"); //or die(trigger_error(mysql_error()));
 			
-			// Process the line items
+			// Process the so line items
 			foreach ($SalesOrder->children() as $Child)
 			{
 				if ($Child->name() == 'SalesOrderLineRet')
@@ -272,7 +272,7 @@ function _quickbooks_salesorder_import_response($requestID, $user, $action, $ID,
 						$lineitem[$keyli] = mysqli_real_escape_string($dblink, $valueli);
 					}
 					
-					// Store the lineitems in MySQL
+					// Store the so line items in MySQL
 					mysqli_query($dblink, "
 						INSERT INTO
 						qb_example_salesorder_salesorderline

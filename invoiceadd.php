@@ -43,7 +43,7 @@ function _quickbooks_invoice_add_request($requestID, $user, $action, $ID, $extra
 {
 	$dblink = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_DATABASE);
 
-    $sql = "SELECT TxnID FROM `qb_invoice` WHERE RefNumber NOT IN (SELECT RefNumber FROM `qb_recent_invoice`)";	
+    $sql = "SELECT TxnID FROM `qb_invoice` WHERE `RefNumber` NOT IN (SELECT RefNumber FROM `qb_recent_invoice`)";	
     $query = mysqli_query($dblink,$sql);
 
     $qbxml = '<?xml version="1.0" encoding="utf-8"?><?qbxml version="13.0"?><QBXML><QBXMLMsgsRq onError="stopOnError">';

@@ -135,5 +135,3 @@ function _quickbooks_so_mod_request($requestID, $user, $action, $ID, $extra, &$e
 function _quickbooks_so_mod_response($requestID, $user, $action, $ID, $extra, &$err, $last_action_time, $last_actionident_time, $xml, $idents)
 {	
 }
-
-

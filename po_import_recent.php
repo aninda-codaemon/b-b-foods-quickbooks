@@ -226,7 +226,6 @@ function _quickbooks_purchaseorder_import_response($requestID, $user, $action, $
 				if ($Child->name() == 'PurchaseOrderLineRet')
 				{
 					// Loop through line items
-					
 					$PurchaseOrderLine = $Child;
 					
 					$IsManuallyClosed = ($PurchaseOrderLine->getChildDataAt('PurchaseOrderLineRet IsManuallyClosed') == true) ? 1 : 0;

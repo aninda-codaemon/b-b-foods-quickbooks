@@ -1235,6 +1235,4 @@ ALTER TABLE `qb_creditmemo` ADD `ExternalGUID` VARCHAR(40) NULL DEFAULT NULL AFT
 -- ALTER TABLE `qb_example_creditmemo` ADD `ExternalGUID` VARCHAR(40) NULL DEFAULT NULL AFTER `Other`;
 -- ALTER TABLE `qb_recent_creditmemo` ADD `ExternalGUID` VARCHAR(40) NULL DEFAULT NULL AFTER `Other`;
 
-ALTER TABLE `qb_purchaseorder` ADD `is_fully_received_from_wms` TINYINT(1) NULL DEFAULT '0' AFTER `IsFullyReceived`;
-ALTER TABLE `qb_example_purchaseorder` ADD `is_fully_received_from_wms` TINYINT(1) NULL DEFAULT '0' AFTER `IsFullyReceived`;
-ALTER TABLE `qb_recent_purchaseorder` ADD `is_fully_received_from_wms` TINYINT(1) NULL DEFAULT '0' AFTER `IsFullyReceived`;
+ALTER TABLE `qb_purchaseorder` CHANGE `is_fully_received_from_wms` `is_fully_received_from_wms` ENUM('Y','N') NOT NULL DEFAULT 'N';

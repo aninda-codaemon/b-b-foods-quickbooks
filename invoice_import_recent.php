@@ -286,3 +286,4 @@ function _quickbooks_invoice_import_response($requestID, $user, $action, $ID, $e
 	
 	return true;
 }
+
