@@ -72,6 +72,7 @@ $map = array(
 	QUICKBOOKS_MOD_PURCHASEORDER => array( '_quickbooks_po_mod_request', '_quickbooks_po_mod_response' ),
 	QUICKBOOKS_ADD_CREDITMEMO => array( '_quickbooks_creditmemo_add_request', '_quickbooks_creditmemo_add_response' ),
 	QUICKBOOKS_ADD_INVOICE => array( '_quickbooks_invoice_add_request', '_quickbooks_invoice_add_response' ),
+	QUICKBOOKS_ADD_ITEMRECEIPT => array( '_quickbooks_receipt_add_request', '_quickbooks_receipt_add_response' ),
     );
     
 /**

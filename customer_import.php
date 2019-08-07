@@ -129,7 +129,7 @@ function _quickbooks_customer_import_response($requestID, $user, $action, $ID, $
 		foreach ($List->children() as $Customer)
 		{
 			$is_active = $Customer->getChildDataAt('CustomerRet IsActive');
-			$is_active_val = ($is_active == true ? '1' : '0');
+			$is_active_val = ($is_active === 'true' ? 1 : 0);
 			
 			$arr = array(
 				'ListID' => $Customer->getChildDataAt('CustomerRet ListID'),
@@ -226,7 +226,7 @@ function _quickbooks_customer_import_response($requestID, $user, $action, $ID, $
 				$arr[$key] = mysqli_real_escape_string($dblink, $value);
 			}
 			
-			// Store the records in MySQL
+			// Store the customer records in MySQL
 			if (!mysqli_query($dblink, "REPLACE INTO qb_example_customer (" . implode(", ", array_keys($arr)) . ") VALUES ('" . implode("', '", array_values($arr)) . "')")){
 				error_log("Error description: " . mysqli_error($dblink));
 			}

@@ -1,12 +1,18 @@
 <?php
-
+// I always program in E_STRICT error mode... 
 error_reporting(E_ALL | E_STRICT);
 ini_set('display_errors', 1);
+
+//set the maximum execution time to infinite for bulk data
+ini_set('max_execution_time', 0);
 
 // Require the framework
 require_once 'QuickBooks.php';
 
-$dblink = mysqli_connect("localhost", "root", "", "quickbooks_sqli");
+// Require the neccessary db connection
+require_once 'IncludesForDB.php';
+
+$dblink = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_DATABASE);
 
 $sql = "SELECT * FROM `qb_example_salesorder`";	
 $query = mysqli_query($dblink,$sql);
@@ -153,6 +159,5 @@ if(mysqli_num_rows($query) > 0) {
         }
         $iteration++;
     }
-    
 }
 

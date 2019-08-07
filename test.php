@@ -32,11 +32,11 @@ if(isset($_GET['action']) && $_GET['action']=='po'){
             if(mysqli_num_rows($query_trxn_pol) > 0) {
                 while ($row_pol = mysqli_fetch_array($query_trxn_pol)) {
                     echo 'Transaction Line: '.$row_pol['TxnLineID'].'<br>';
-                    $sql_pol = "SELECT `Quantity` FROM `qb_purchaseorder_purchaseorderline` where `TxnLineID` = '".$row_pol['TxnLineID']."'";	
+                    $sql_pol = "SELECT `ReceivedQuantity` FROM `qb_purchaseorder_purchaseorderline` where `TxnLineID` = '".$row_pol['TxnLineID']."'";	
                     $query_pol = mysqli_query($dblink, $sql_pol);
                     $result_pol = mysqli_fetch_assoc($query_pol);
                     
-                    $sql_recent_pol = "SELECT `Quantity` FROM `qb_recent_purchaseorder_purchaseorderline` where `TxnLineID` = '".$row_pol['TxnLineID']."'";	
+                    $sql_recent_pol = "SELECT `ReceivedQuantity` FROM `qb_recent_purchaseorder_purchaseorderline` where `TxnLineID` = '".$row_pol['TxnLineID']."'";	
                     $query_recent_pol = mysqli_query($dblink, $sql_recent_pol);
                     $result_recent_pol = mysqli_fetch_assoc($query_recent_pol);
 
@@ -56,37 +56,59 @@ if(isset($_GET['action']) && $_GET['action']=='po'){
         }
         
         if(!empty($arr_TxnID)){
-            foreach($arr_TxnID as $key=>$val){
-                $qbxml .= '<PurchaseOrderModRq>';
-                
-                $sql_xml_po = "SELECT TxnID, EditSequence FROM `qb_purchaseorder` WHERE TxnID = '".$val."'";	
-                $query_xml_po = mysqli_query($dblink, $sql_xml_po);
-                $result_xml_po = mysqli_fetch_assoc($query_xml_po);
-
-                $qbxml .= '<PurchaseOrderMod>';
-                $qbxml .= '<TxnID>'.$result_xml_po['TxnID'].'</TxnID>';
-                $qbxml .= '<EditSequence>'.$result_xml_po['EditSequence'].'</EditSequence>';
-
-                $sql_xml_pol = "SELECT TxnLineID FROM `qb_purchaseorder_purchaseorderline` where `PurchaseOrder_TxnID` = '".$val."'";	
-                $query_xml_pol = mysqli_query($dblink, $sql_xml_pol);
-                if(mysqli_num_rows($query_xml_pol) > 0) {
-                    while ($row_xml_pol = mysqli_fetch_array($query_xml_pol)) {
-                        $sql_xml_pols = "SELECT `TxnLineID`, `Item_ListID`, `Item_FullName`, `Quantity` FROM `qb_purchaseorder_purchaseorderline` where `TxnLineID` = '".$row_xml_pol['TxnLineID']."'";	
-                        $query_xml_pols = mysqli_query($dblink, $sql_xml_pols);
-                        $result_xml_pols = mysqli_fetch_assoc($query_xml_pols);
-
-                        $qbxml .= '<PurchaseOrderLineMod>';
-                        $qbxml .= '<TxnLineID>'.$result_xml_pols['TxnLineID'].'</TxnLineID>';
-                        $qbxml .= '<ItemRef><ListID>'.$result_xml_pols['Item_ListID'].'</ListID><FullName>'.$result_xml_pols['Item_FullName'].'</FullName></ItemRef>';
-                        $qbxml .= '<Quantity>'.$result_xml_pols['Quantity'].'</Quantity>';
-                        $qbxml .= '</PurchaseOrderLineMod>';
-                    }
-                }
-
-                $qbxml .= '</PurchaseOrderMod>';
-                $qbxml .='</PurchaseOrderModRq>';
-            }
-        }
+			foreach($arr_TxnID as $key=>$val){
+				$sql_xml_po = "SELECT * FROM `qb_purchaseorder` WHERE TxnID = '".$val."'";	
+				$query_xml_po = mysqli_query($dblink, $sql_xml_po);
+				$result_xml_po = mysqli_fetch_assoc($query_xml_po);
+	
+				$qbxml .= '<ItemReceiptAddRq requestID="'.$result_xml_po['RefNumber'].'">';
+				$qbxml .= '<ItemReceiptAdd>';
+				$qbxml .= '<VendorRef><FullName>'.htmlspecialchars($result_xml_po['Vendor_FullName']).'</FullName></VendorRef>';
+				$qbxml .= '<RefNumber>'.$result_xml_po['RefNumber'].'</RefNumber>';
+				$qbxml .= '<LinkToTxnID>'.$result_xml_po['TxnID'].'</LinkToTxnID>';
+	
+				$sql_xml_pol = "SELECT TxnLineID FROM `qb_purchaseorder_purchaseorderline` where `PurchaseOrder_TxnID` = '".$val."'";	
+				$query_xml_pol = mysqli_query($dblink, $sql_xml_pol);
+				if(mysqli_num_rows($query_xml_pol) > 0) {
+					while ($row_xml_pol = mysqli_fetch_array($query_xml_pol)) {
+						$sql_xml_pols = "SELECT * FROM `qb_purchaseorder_purchaseorderline` where `TxnLineID` = '".$row_xml_pol['TxnLineID']."'";	
+						$query_xml_pols = mysqli_query($dblink, $sql_xml_pols);
+						$result_xml_pols = mysqli_fetch_assoc($query_xml_pols);
+	
+						$qbxml .= '<ItemLineAdd>';
+						$qbxml .= '<ItemRef><FullName>'.htmlspecialchars($result_xml_pols['Item_FullName']).'</FullName></ItemRef>';
+						if(!empty($result_xml_pols['Descrip'])){
+						$qbxml .= '<Desc>'.htmlspecialchars($result_xml_pols['Descrip']).'</Desc>';
+						}
+						if(!empty($result_xml_pols['ReceivedQuantity'])){
+						$qbxml .= '<Quantity>'.$result_xml_pols['ReceivedQuantity'].'</Quantity>';
+						}
+						if(!empty($result_xml_pols['UnitOfMeasure'])){
+						$qbxml .= '<UnitOfMeasure>'.$result_xml_pols['UnitOfMeasure'].'</UnitOfMeasure>';
+						}
+						if(!empty($result_xml_pols['Rate'])){
+						$qbxml .= '<Cost>'.$result_xml_pols['Rate'].'</Cost>';
+                        }
+                        
+                        $Amount = $result_xml_pols['Rate']*$result_xml_pols['ReceivedQuantity'];
+						$qbxml .= '<Amount>'.floatval($Amount).'</Amount>';
+						
+						if(!empty($result_xml_pols['Customer_FullName'])){
+							$qbxml .= '<CustomerRef><FullName>'.htmlspecialchars($result_xml_pols['Customer_FullName']).'</FullName></CustomerRef>';
+						} 
+						if(!empty($result_xml_pols['Class_FullName'])){
+							$qbxml .= '<ClassRef><FullName>'.htmlspecialchars($result_xml_pols['Class_FullName']).'</FullName></ClassRef>';
+                        }
+                        
+                        //$qbxml .= '<LinkToTxn><TxnID>'.$result_xml_pols['PurchaseOrder_TxnID'].'</TxnID><TxnLineID>'.$result_xml_pols['TxnLineID'].'</TxnLineID></LinkToTxn>';
+						$qbxml .= '</ItemLineAdd>';
+					}
+				}
+	
+				$qbxml .= '</ItemReceiptAdd>';
+				$qbxml .='</ItemReceiptAddRq>';
+			}
+		}
         print_r($arr_TxnID);
         //echo '<pre>';
     }
@@ -1013,6 +1035,55 @@ if(isset($_GET['action']) && $_GET['action']=='creditmemoadd'){
     }
     $qbxml .='</QBXMLMsgsRq></QBXML>';
 
+    echo $qbxml;
+}
+
+if(isset($_GET['action']) && $_GET['action']=='po_rcpt'){
+    $sql = "SELECT * FROM `qb_purchaseorder` WHERE `is_fully_received_from_wms` = 'Y' AND `IsFullyReceived` = '0'";	
+    $query = mysqli_query($dblink, $sql);
+    $qbxml = '<?xml version="1.0" encoding="utf-8"?><?qbxml version="13.0"?><QBXML><QBXMLMsgsRq onError="stopOnError">';
+    if(mysqli_num_rows($query) > 0) {
+        while ($row = mysqli_fetch_array($query)) {
+            $sql_trxn_pol = "SELECT * FROM `qb_purchaseorder_purchaseorderline` where `PurchaseOrder_TxnID` = '".$row['TxnID']."'";	
+			$query_trxn_pol = mysqli_query($dblink, $sql_trxn_pol);
+			if(mysqli_num_rows($query_trxn_pol) > 0) {
+                $qbxml .= '<ItemReceiptAddRq>';
+                $qbxml .= '<ItemReceiptAdd defMacro="TxnID:'.$row['TxnID'].'">';
+				$qbxml .= '<VendorRef><FullName>'.htmlspecialchars($row['Vendor_FullName']).'</FullName></VendorRef>';
+                $qbxml .= '<RefNumber>'.$row['RefNumber'].'</RefNumber>';
+                $qbxml .= '<LinkToTxnID>'.$row['TxnID'].'</LinkToTxnID>';
+				while ($row_pol = mysqli_fetch_array($query_trxn_pol)) {
+                    $qbxml .= '<ItemLineAdd>';
+                    $qbxml .= '<ItemRef><FullName>'.htmlspecialchars($row_pol['Item_FullName']).'</FullName></ItemRef>';
+                    if(!empty($row_pol['Descrip'])){
+                    $qbxml .= '<Desc>'.htmlspecialchars($row_pol['Descrip']).'</Desc>';
+                    }
+                    if(!empty($row_pol['Quantity'])){
+                    $qbxml .= '<Quantity>'.$row_pol['Quantity'].'</Quantity>';
+                    }
+                    if(!empty($row_pol['UnitOfMeasure'])){
+                    $qbxml .= '<UnitOfMeasure>'.$row_pol['UnitOfMeasure'].'</UnitOfMeasure>';
+                    }
+                    if(!empty($row_pol['Rate'])){
+                    $qbxml .= '<Cost>'.$row_pol['Rate'].'</Cost>';
+                    }
+                    if(!empty($row_pol['Amount'])){
+                    $qbxml .= '<Amount>'.$row_pol['Amount'].'</Amount>';
+                    }
+                    if(!empty($row_pol['Customer_FullName'])){
+                        $qbxml .= '<CustomerRef><FullName>'.htmlspecialchars($row_pol['Customer_FullName']).'</FullName></CustomerRef>';
+                    } 
+                    if(!empty($row_pol['Class_FullName'])){
+                        $qbxml .= '<ClassRef><FullName>'.htmlspecialchars($row_pol['Class_FullName']).'</FullName></ClassRef>';
+                    } 
+                    $qbxml .= '</ItemLineAdd>';
+                }
+                $qbxml .= '</ItemReceiptAdd>';
+                $qbxml .= '</ItemReceiptAddRq>';
+            }
+        }
+    }
+    $qbxml .='</QBXMLMsgsRq></QBXML>';
     echo $qbxml;
 }
 ?>

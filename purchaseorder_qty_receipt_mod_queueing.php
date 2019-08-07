@@ -9,5 +9,5 @@ require_once 'QuickBooks.php';
 require_once 'IncludesForDB.php';
 
 $Queue = new QuickBooks_WebConnector_Queue(QB_QUICKBOOKS_DSN);
-$Queue->enqueue(QUICKBOOKS_ADD_CREDITMEMO);
+$Queue->enqueue(QUICKBOOKS_ADD_ITEMRECEIPT);
 

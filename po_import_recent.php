@@ -128,10 +128,10 @@ function _quickbooks_purchaseorder_import_response($requestID, $user, $action, $
 		
 		foreach ($List->children() as $PurchaseOrder)
 		{
-			$IsManuallyClosed = ($PurchaseOrder->getChildDataAt('PurchaseOrderRet IsManuallyClosed') == true) ? 1 : 0;
-			$IsFullyReceived = ($PurchaseOrder->getChildDataAt('PurchaseOrderRet IsFullyReceived') == true) ? 1 : 0;
-			$IsToBePrinted = ($PurchaseOrder->getChildDataAt('PurchaseOrderRet IsToBePrinted') == true) ? 1 : 0;
-			$IsToBeEmailed = ($PurchaseOrder->getChildDataAt('PurchaseOrderRet IsToBeEmailed') == true) ? 1 : 0;
+			$IsManuallyClosed = ($PurchaseOrder->getChildDataAt('PurchaseOrderRet IsManuallyClosed') === 'true') ? 1 : 0;
+			$IsFullyReceived = ($PurchaseOrder->getChildDataAt('PurchaseOrderRet IsFullyReceived') === 'true') ? 1 : 0;
+			$IsToBePrinted = ($PurchaseOrder->getChildDataAt('PurchaseOrderRet IsToBePrinted') === 'true') ? 1 : 0;
+			$IsToBeEmailed = ($PurchaseOrder->getChildDataAt('PurchaseOrderRet IsToBeEmailed') === 'true') ? 1 : 0;
 			$arr = array(
 				'TxnID' => $PurchaseOrder->getChildDataAt('PurchaseOrderRet TxnID'),
 				'TimeCreated' => $PurchaseOrder->getChildDataAt('PurchaseOrderRet TimeCreated'),
@@ -226,7 +226,6 @@ function _quickbooks_purchaseorder_import_response($requestID, $user, $action, $
 				if ($Child->name() == 'PurchaseOrderLineRet')
 				{
 					// Loop through line items
-					
 					$PurchaseOrderLine = $Child;
 					
 					$IsManuallyClosed = ($PurchaseOrderLine->getChildDataAt('PurchaseOrderLineRet IsManuallyClosed') == true) ? 1 : 0;
