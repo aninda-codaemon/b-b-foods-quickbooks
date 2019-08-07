@@ -108,5 +108,4 @@ function _quickbooks_receipt_add_request($requestID, $user, $action, $ID, $extra
  */
 function _quickbooks_receipt_add_response($requestID, $user, $action, $ID, $extra, &$err, $last_action_time, $last_actionident_time, $xml, $idents)
 {	
-    return $qbxml;
 }
